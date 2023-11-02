@@ -1,0 +1,4 @@
+name: sbx_template
+channels:
+  - conda-forge
+  - bioconda
