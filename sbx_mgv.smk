@@ -27,16 +27,18 @@ def get_mgv_db_path() -> Path:
 
 
 localrules:
-    all_template,
+    all_mgv,
 
 
 rule all_mgv:
     input:
-        VIRUS_FP / "mgv" / "{sample}_viral_contigs.tsv"
+        expand(VIRUS_FP / "mgv" / "{sample}_viral_contigs.tsv", sample=Samples.keys()),
 
 rule install_mgv:
     output:
         VIRUS_FP / "mgv" / ".installed",
+        get_mgv_db_path() / "imgvr.hmm",
+        get_mgv_db_path() / "pfam.hmm",
     params:
         ext_path=get_mgv_ext_path(),
     shell:
