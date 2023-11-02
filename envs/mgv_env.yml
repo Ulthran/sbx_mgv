@@ -1,0 +1,6 @@
+channels:
+  - bioconda
+dependencies:
+  - prodigal =2.6.3
+  - hmmer =3.1b2
+name: mgv_env
