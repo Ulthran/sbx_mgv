@@ -126,27 +126,9 @@ rule mgv_count_viral_gene_hits:
         """
 
 
-rule install_virfinder:
-    output:
-        VIRUS_FP / "mgv" / ".installed_virfinder",
-    params:
-        fp=str(get_mgv_ext_path()),
-    conda:
-        "envs/virfinder_env.yml"
-    shell:
-        """
-        cd {params.fp}
-        wget https://github.com/jessieren/VirFinder/blob/master/linux/VirFinder_1.1.tar.gz
-        Rscript scripts/install_virfinder.R
-        rm VirFinder_1.1.tar.gz
-        touch {output}
-        """
-
-
 rule mgv_virfinder:
     input:
         contigs=ASSEMBLY_FP / "virus_id_megahit" / "{sample}_asm" / "final.contigs.fa",
-        installed=VIRUS_FP / "mgv" / ".installed_virfinder",
     output:
         tsv=VIRUS_FP / "mgv" / "{sample}_virfinder.tsv",
     params:
