@@ -32,7 +32,7 @@ localrules:
 
 rule all_mgv:
     input:
-
+        VIRUS_FP / "mgv" / "{sample}_viral_contigs.tsv"
 
 rule install_mgv:
     output:
