@@ -34,11 +34,12 @@ rule all_mgv:
     input:
         expand(VIRUS_FP / "mgv" / "{sample}_viral_contigs.tsv", sample=Samples.keys()),
 
+
 rule install_mgv:
     output:
-        VIRUS_FP / "mgv" / ".installed",
-        get_mgv_db_path() / "imgvr.hmm",
-        get_mgv_db_path() / "pfam.hmm",
+        installed=VIRUS_FP / "mgv" / ".installed",
+        imgvr=get_mgv_db_path() / "imgvr.hmm",
+        pfam=get_mgv_db_path() / "pfam.hmm",
     params:
         ext_path=get_mgv_ext_path(),
     shell:
@@ -57,6 +58,8 @@ rule install_mgv:
             wget -O input/pfam.hmm.gz ftp://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam31.0/Pfam-A.hmm.gz
             gunzip input/pfam.hmm.gz
         fi
+
+        touch {output.installed}
         """
 
 
@@ -69,11 +72,12 @@ rule mgv_prodigal:
         ffn=VIRUS_FP / "mgv" / "prodigal" / "{sample}.ffn",
         gff=VIRUS_FP / "mgv" / "prodigal" / "{sample}.gff",
     conda:
-        "envs/mgv_env.yml",
+        "envs/mgv_env.yml"
     shell:
         """
         prodigal -i {input.contigs} -a {output.faa} -d {output.ffn} -p meta -f gff > {output.gff}
         """
+
 
 rule mgv_hmmsearch_imgvr:
     input:
@@ -82,7 +86,7 @@ rule mgv_hmmsearch_imgvr:
     output:
         hmmout=VIRUS_FP / "mgv" / "hmmsearch" / "{sample}.imgvr.hmmout",
     conda:
-        "envs/mgv_env.yml",
+        "envs/mgv_env.yml"
     threads: 8
     shell:
         """
@@ -97,7 +101,7 @@ rule mgv_hmmsearch_pfam:
     output:
         hmmout=VIRUS_FP / "mgv" / "hmmsearch" / "{sample}.pfam.hmmout",
     conda:
-        "envs/mgv_env.yml",
+        "envs/mgv_env.yml"
     threads: 8
     shell:
         """
@@ -133,13 +137,14 @@ rule install_virfinder:
         """
         cd {params.fp}
         wget https://github.com/jessieren/VirFinder/blob/master/linux/VirFinder_1.1.tar.gz
-        R CMD INSTALL VirFinder_1.1.tar.gz
+        Rscript scripts/install_virfinder.R
         rm VirFinder_1.1.tar.gz
+        touch {output}
         """
 
 
 rule mgv_virfinder:
-    input:  
+    input:
         contigs=ASSEMBLY_FP / "virus_id_megahit" / "{sample}_asm" / "final.contigs.fa",
         installed=VIRUS_FP / "mgv" / ".installed_virfinder",
     output:
@@ -147,7 +152,7 @@ rule mgv_virfinder:
     params:
         fp=str(get_mgv_ext_path() / "MGV" / "viral_detection_pipeline"),
     conda:
-        "envs/virfinder_env.yml",
+        "envs/virfinder_env.yml"
     shell:
         """
         cd {params.fp}
