@@ -44,7 +44,9 @@ rule install_mgv:
     shell:
         """
         cd {params.ext_path}
-        git clone https://github.com/snayfach/MGV.git
+        if ! [ -d MGV ]; then
+            git clone https://github.com/snayfach/MGV.git
+        fi
         cd MGV/viral_detection_pipeline/
 
         if ! [ -f input/imgvr.hmm ]; then
@@ -130,9 +132,9 @@ rule install_virfinder:
     shell:
         """
         cd {params.fp}
-        wget https://github.com/jessieren/VirFinder/archive/refs/tags/v1.1.tar.gz
-        R CMD INSTALL v1.1.tar.gz
-        rm v1.1.tar.gz
+        wget https://github.com/jessieren/VirFinder/blob/master/linux/VirFinder_1.1.tar.gz
+        R CMD INSTALL VirFinder_1.1.tar.gz
+        rm VirFinder_1.1.tar.gz
         """
 
 
