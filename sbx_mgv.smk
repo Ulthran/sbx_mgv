@@ -32,7 +32,7 @@ localrules:
 
 rule all_mgv:
     input:
-        expand(VIRUS_FP / "mgv" / "{sample}" / "viral_contigs.tsv", sample=Samples.keys()),
+        expand(VIRUS_FP / "mgv" / "{sample}_out" / "{sample}.tsv", sample=Samples.keys()),
 
 
 rule install_mgv:
