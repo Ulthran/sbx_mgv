@@ -105,9 +105,10 @@ rule mgv_hmmsearch_imgvr:
         hmmout=VIRUS_FP / "mgv" / "{sample}_out" / "imgvr.out",
     conda:
         "envs/mgv_env.yml"
-    threads: 8
+    threads: 32
     resources:
-        mem_mb=16000
+        mem_mb=16000,
+        runtime=60,
     shell:
         """
         hmmsearch -Z 1 --cpu {threads} --noali --tblout {output.hmmout} {input.imgvr} {input.faa}
@@ -122,9 +123,10 @@ rule mgv_hmmsearch_pfam:
         hmmout=VIRUS_FP / "mgv" / "{sample}_out" / "pfam.out",
     conda:
         "envs/mgv_env.yml"
-    threads: 8
+    threads: 32
     resources:
-        mem_mb=16000
+        mem_mb=16000,
+        runtime=60,
     shell:
         """
         hmmsearch -Z 1 --cut_tc --cpu {threads} --noali --tblout {output.hmmout} {input.pfam} {input.faa}
