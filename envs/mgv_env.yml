@@ -1,6 +1,8 @@
 channels:
   - bioconda
+  - conda-forge
 dependencies:
   - prodigal =2.6.3
   - hmmer =3.1b2
+  - biopython
 name: mgv_env
