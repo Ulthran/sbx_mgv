@@ -32,7 +32,7 @@ localrules:
 
 rule all_mgv:
     input:
-        expand(VIRUS_FP / "mgv" / "{sample}_viral_contigs.tsv", sample=Samples.keys()),
+        expand(VIRUS_FP / "mgv" / "{sample}" / "viral_contigs.tsv", sample=Samples.keys()),
 
 
 rule install_mgv:
@@ -82,23 +82,25 @@ rule mgv_prodigal:
         contigs=ASSEMBLY_FP / "virus_id_megahit" / "{sample}_asm" / "final.contigs.fa",
         installed=VIRUS_FP / "mgv" / ".installed",
     output:
-        faa=VIRUS_FP / "mgv" / "prodigal" / "{sample}.faa",
-        ffn=VIRUS_FP / "mgv" / "prodigal" / "{sample}.ffn",
-        gff=VIRUS_FP / "mgv" / "prodigal" / "{sample}.gff",
+        fna=VIRUS_FP / "mgv" / "{sample}" / "{sample}.fna",
+        faa=VIRUS_FP / "mgv" / "{sample}" / "{sample}.faa",
+        ffn=VIRUS_FP / "mgv" / "{sample}" / "{sample}.ffn",
+        gff=VIRUS_FP / "mgv" / "{sample}" / "{sample}.gff",
     conda:
         "envs/mgv_env.yml"
     shell:
         """
-        prodigal -i {input.contigs} -a {output.faa} -d {output.ffn} -p meta -f gff > {output.gff}
+        cp {input.contigs} {output.fna}
+        prodigal -i {output.fna} -a {output.faa} -d {output.ffn} -p meta -f gff > {output.gff}
         """
 
 
 rule mgv_hmmsearch_imgvr:
     input:
-        faa=VIRUS_FP / "mgv" / "prodigal" / "{sample}.faa",
+        faa=VIRUS_FP / "mgv" / "{sample}" / "{sample}.faa",
         imgvr=get_mgv_db_path() / "imgvr.hmm",
     output:
-        hmmout=VIRUS_FP / "mgv" / "hmmsearch" / "{sample}.imgvr.hmmout",
+        hmmout=VIRUS_FP / "mgv" / "{sample}" / "imgvr.out",
     conda:
         "envs/mgv_env.yml"
     threads: 8
@@ -110,10 +112,10 @@ rule mgv_hmmsearch_imgvr:
 
 rule mgv_hmmsearch_pfam:
     input:
-        faa=VIRUS_FP / "mgv" / "prodigal" / "{sample}.faa",
+        faa=VIRUS_FP / "mgv" / "{sample}" / "{sample}.faa",
         pfam=get_mgv_db_path() / "pfam.hmm",
     output:
-        hmmout=VIRUS_FP / "mgv" / "hmmsearch" / "{sample}.pfam.hmmout",
+        hmmout=VIRUS_FP / "mgv" / "{sample}" / "pfam.out",
     conda:
         "envs/mgv_env.yml"
     threads: 8
@@ -125,12 +127,12 @@ rule mgv_hmmsearch_pfam:
 
 rule mgv_count_viral_gene_hits:
     input:
-        contigs=ASSEMBLY_FP / "virus_id_megahit" / "{sample}_asm" / "final.contigs.fa",
-        faa=VIRUS_FP / "mgv" / "prodigal" / "{sample}.faa",
-        hmmout_imgvr=VIRUS_FP / "mgv" / "hmmsearch" / "{sample}.imgvr.hmmout",
-        hmmout_pfam=VIRUS_FP / "mgv" / "hmmsearch" / "{sample}.pfam.hmmout",
+        contigs=VIRUS_FP / "mgv" / "{sample}" / "{sample}.fna",
+        faa=VIRUS_FP / "mgv" / "{sample}" / "{sample}.faa",
+        hmmout_imgvr=VIRUS_FP / "mgv" / "{sample}" / "imgvr.out",
+        hmmout_pfam=VIRUS_FP / "mgv" / "{sample}" / "pfam.out",
     output:
-        tsv=VIRUS_FP / "mgv" / "{sample}_hmm_hits.tsv",
+        tsv=VIRUS_FP / "mgv" / "{sample}" / "hmm_hits.tsv",
     params:
         fp=str(get_mgv_ext_path() / "MGV" / "viral_detection_pipeline"),
     conda:
@@ -144,9 +146,9 @@ rule mgv_count_viral_gene_hits:
 
 rule mgv_virfinder:
     input:
-        contigs=ASSEMBLY_FP / "virus_id_megahit" / "{sample}_asm" / "final.contigs.fa",
+        contigs=VIRUS_FP / "mgv" / "{sample}" / "{sample}.fna",
     output:
-        tsv=VIRUS_FP / "mgv" / "{sample}_virfinder.tsv",
+        tsv=VIRUS_FP / "mgv" / "{sample}" / "virfinder.tsv",
     params:
         fp=str(get_mgv_ext_path() / "MGV" / "viral_detection_pipeline"),
     conda:
@@ -160,10 +162,10 @@ rule mgv_virfinder:
 
 rule mgv_strand_switch:
     input:
-        contigs=ASSEMBLY_FP / "virus_id_megahit" / "{sample}_asm" / "final.contigs.fa",
-        faa=VIRUS_FP / "mgv" / "prodigal" / "{sample}.faa",
+        contigs=VIRUS_FP / "mgv" / "{sample}" / "{sample}.fna",
+        faa=VIRUS_FP / "mgv" / "{sample}" / "{sample}.faa",
     output:
-        tsv=VIRUS_FP / "mgv" / "{sample}_strand_switch.tsv",
+        tsv=VIRUS_FP / "mgv" / "{sample}" / "strand_switch.tsv",
     params:
         fp=str(get_mgv_ext_path() / "MGV" / "viral_detection_pipeline"),
     conda:
@@ -177,11 +179,11 @@ rule mgv_strand_switch:
 
 rule mgv_master_table:
     input:
-        hmm=VIRUS_FP / "mgv" / "{sample}_hmm_hits.tsv",
-        virfinder=VIRUS_FP / "mgv" / "{sample}_virfinder.tsv",
-        strand_switch=VIRUS_FP / "mgv" / "{sample}_strand_switch.tsv",
+        hmm=VIRUS_FP / "mgv" / "{sample}" / "hmm_hits.tsv",
+        virfinder=VIRUS_FP / "mgv" / "{sample}" / "virfinder.tsv",
+        strand_switch=VIRUS_FP / "mgv" / "{sample}" / "strand_switch.tsv",
     output:
-        tsv=VIRUS_FP / "mgv" / "{sample}_master_table.tsv",
+        tsv=VIRUS_FP / "mgv" / "{sample}" / "master_table.tsv",
     params:
         fp=str(get_mgv_ext_path() / "MGV" / "viral_detection_pipeline"),
     conda:
@@ -195,17 +197,17 @@ rule mgv_master_table:
 
 rule mgv_predict_viral_contigs:
     input:
-        mt=VIRUS_FP / "mgv" / "{sample}_master_table.tsv",
+        mt=VIRUS_FP / "mgv" / "{sample}" / "master_table.tsv",
     output:
-        tsv=VIRUS_FP / "mgv" / "{sample}_viral_contigs.tsv",
+        tsv=VIRUS_FP / "mgv" / "{sample}" / "viral_contigs.tsv",
     params:
         fp=str(get_mgv_ext_path() / "MGV" / "viral_detection_pipeline"),
-        in_base=str(VIRUS_FP / "mgv" / "prodigal"),
-        out_base=str(VIRUS_FP / "mgv"),
+        in_base=str(VIRUS_FP / "mgv" / "{sample}"),
+        out_base=str(VIRUS_FP / "mgv" / "{sample}"),
     conda:
         "envs/mgv_env.yml"
     shell:
         """
         cd {params.fp}
-        python viral_classify.py --features {input.mt} -in_base {params.in_base} --out_base {params.out_base}
+        python viral_classify.py --features {input.mt} --in_base {params.in_base} --out_base {params.out_base}
         """
