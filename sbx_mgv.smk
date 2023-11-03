@@ -38,6 +38,24 @@ rule all_mgv:
 rule install_mgv:
     output:
         installed=VIRUS_FP / "mgv" / ".installed",
+    params:
+        ext_path=get_mgv_ext_path(),
+    shell:
+        """
+        cd {params.ext_path}
+        if [ ! -d MGV ]; then
+            echo "Installing MGV"
+            git clone https://github.com/snayfach/MGV.git
+        fi
+
+        touch {output.installed}
+        """
+    
+
+rule install_mgv_dbs:
+    input:
+        VIRUS_FP / "mgv" / ".installed",
+    output:
         imgvr=get_mgv_db_path() / "imgvr.hmm",
         pfam=get_mgv_db_path() / "pfam.hmm",
     params:
@@ -45,9 +63,6 @@ rule install_mgv:
     shell:
         """
         cd {params.ext_path}
-        if ! [ -d MGV ]; then
-            git clone https://github.com/snayfach/MGV.git
-        fi
         cd MGV/viral_detection_pipeline/
 
         if ! [ -f input/imgvr.hmm ]; then
@@ -58,11 +73,10 @@ rule install_mgv:
             wget -O input/pfam.hmm.gz ftp://ftp.ebi.ac.uk/pub/databases/Pfam/releases/Pfam31.0/Pfam-A.hmm.gz
             gunzip input/pfam.hmm.gz
         fi
-
-        touch {output.installed}
         """
 
 
+# This relies on the first rule from sbx_virus_id -_-
 rule mgv_prodigal:
     input:
         contigs=ASSEMBLY_FP / "virus_id_megahit" / "{sample}_asm" / "final.contigs.fa",
