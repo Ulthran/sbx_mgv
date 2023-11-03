@@ -133,6 +133,8 @@ rule mgv_count_viral_gene_hits:
         tsv=VIRUS_FP / "mgv" / "{sample}_hmm_hits.tsv",
     params:
         fp=str(get_mgv_ext_path() / "MGV" / "viral_detection_pipeline"),
+    conda:
+        "envs/mgv_env.yml"
     shell:
         """
         cd {params.fp}
@@ -164,6 +166,8 @@ rule mgv_strand_switch:
         tsv=VIRUS_FP / "mgv" / "{sample}_strand_switch.tsv",
     params:
         fp=str(get_mgv_ext_path() / "MGV" / "viral_detection_pipeline"),
+    conda:
+        "envs/mgv_env.yml"
     shell:
         """
         cd {params.fp}
@@ -180,6 +184,8 @@ rule mgv_master_table:
         tsv=VIRUS_FP / "mgv" / "{sample}_master_table.tsv",
     params:
         fp=str(get_mgv_ext_path() / "MGV" / "viral_detection_pipeline"),
+    conda:
+        "envs/mgv_env.yml"
     shell:
         """
         cd {params.fp}
@@ -196,6 +202,8 @@ rule mgv_predict_viral_contigs:
         fp=str(get_mgv_ext_path() / "MGV" / "viral_detection_pipeline"),
         in_base=str(VIRUS_FP / "mgv" / "prodigal"),
         out_base=str(VIRUS_FP / "mgv"),
+    conda:
+        "envs/mgv_env.yml"
     shell:
         """
         cd {params.fp}
