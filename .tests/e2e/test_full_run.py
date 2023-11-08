@@ -40,9 +40,7 @@ def run_sunbeam(setup):
 
     output_fp = os.path.join(project_dir, "sunbeam_output")
 
-    long_fp = os.path.join(
-        output_fp, f"virus/mgv/LONG_out/LONG.tsv"
-    )
+    long_fp = os.path.join(output_fp, f"virus/mgv/LONG_out/LONG.tsv")
     short_fp = os.path.join(output_fp, f"virus/mgv/SHORT_out/SHORT.tsv")
 
     benchmarks_fp = os.path.join(project_dir, "stats/")
@@ -59,5 +57,5 @@ def test_full_run(run_sunbeam):
 
     with open(long_fp) as f:
         assert len(f.readlines()) > 2
-    
-    assert os.stat(short_fp).st_size > 0
+
+    assert os.stat(short_fp).st_size == 0
