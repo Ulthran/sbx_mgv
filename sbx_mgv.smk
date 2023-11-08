@@ -233,7 +233,7 @@ rule mgv_master_table:
     shell:
         """
         cd {params.fp}
-        if [ -s {input.hmm} && -s {input.virfinder} && -s {input.strand_switch} ]; then
+        if [ -s {input.hmm} ] && [ -s {input.virfinder} ] && [ -s {input.strand_switch} ]; then
             python master_table.py {input.hmm} {input.virfinder} {input.strand_switch} > {output.tsv}
         else
             echo "No contigs assembled for {wildcards.sample}"
