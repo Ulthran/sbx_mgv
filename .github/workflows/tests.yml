@@ -20,9 +20,10 @@ jobs:
       - name: Test with Sunbeam
         uses: sunbeam-labs/sbx_test_action@v0
         with:
-          sunbeam-version: 'dev'
-          extension-name: 'sunbeam-labs/sbx_template'
+          sunbeam-version: 'main'
+          extension-name: 'Ulthran/sbx_mgv'
           extension-branch-name: ${{ github.head_ref }}
+          other-extensions: 'sunbeam-labs/sbx_virus_id'
 
   test-units:
     name: Run Unittests
