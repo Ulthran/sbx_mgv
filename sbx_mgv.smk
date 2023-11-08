@@ -95,7 +95,14 @@ rule mgv_prodigal:
     shell:
         """
         cp {input.contigs} {output.fna}
-        prodigal -i {output.fna} -a {output.faa} -d {output.ffn} -p meta -f gff > {output.gff}
+        if [ -s {output.fna} ]; then
+            prodigal -i {output.fna} -a {output.faa} -d {output.ffn} -p meta -f gff > {output.gff}
+        else
+            echo "No contigs assembled for {wildcards.sample}"
+            touch {output.faa}
+            touch {output.ffn}
+            touch {output.gff}
+        fi
         """
 
 
@@ -113,7 +120,12 @@ rule mgv_hmmsearch_imgvr:
         runtime=60,
     shell:
         """
-        hmmsearch -Z 1 --cpu {threads} --noali --tblout {output.hmmout} {input.imgvr} {input.faa}
+        if [ -s {input.faa} ]; then
+            hmmsearch -Z 1 --cpu {threads} --noali --tblout {output.hmmout} {input.imgvr} {input.faa}
+        else
+            echo "No contigs assembled for {wildcards.sample}"
+            touch {output.hmmout}
+        fi
         """
 
 
@@ -131,7 +143,12 @@ rule mgv_hmmsearch_pfam:
         runtime=60,
     shell:
         """
-        hmmsearch -Z 1 --cut_tc --cpu {threads} --noali --tblout {output.hmmout} {input.pfam} {input.faa}
+        if [ -s {input.faa} ]; then
+            hmmsearch -Z 1 --cut_tc --cpu {threads} --noali --tblout {output.hmmout} {input.pfam} {input.faa}
+        else
+            echo "No contigs assembled for {wildcards.sample}"
+            touch {output.hmmout}
+        fi
         """
 
 
@@ -150,7 +167,12 @@ rule mgv_count_viral_gene_hits:
     shell:
         """
         cd {params.fp}
-        python count_hmm_hits.py {input.contigs} {input.faa} {input.hmmout_imgvr} {input.hmmout_pfam} > {output.tsv}
+        if [ -s {input.contigs} ]; then
+            python count_hmm_hits.py {input.contigs} {input.faa} {input.hmmout_imgvr} {input.hmmout_pfam} > {output.tsv}
+        else
+            echo "No contigs assembled for {wildcards.sample}"
+            touch {output.tsv}
+        fi
         """
 
 
@@ -166,7 +188,12 @@ rule mgv_virfinder:
     shell:
         """
         cd {params.fp}
-        Rscript virfinder.R {input.contigs} {output.tsv}
+        if [ -s {input.contigs} ]; then
+            Rscript virfinder.R {input.contigs} {output.tsv}
+        else
+            echo "No contigs assembled for {wildcards.sample}"
+            touch {output.tsv}
+        fi
         """
 
 
@@ -183,7 +210,12 @@ rule mgv_strand_switch:
     shell:
         """
         cd {params.fp}
-        python strand_switch.py {input.contigs} {input.faa} > {output.tsv}
+        if [ -s {input.contigs} ]; then
+            python strand_switch.py {input.contigs} {input.faa} > {output.tsv}
+        else
+            echo "No contigs assembled for {wildcards.sample}"
+            touch {output.tsv}
+        fi
         """
 
 
@@ -201,7 +233,12 @@ rule mgv_master_table:
     shell:
         """
         cd {params.fp}
-        python master_table.py {input.hmm} {input.virfinder} {input.strand_switch} > {output.tsv}
+        if [ -s {input.hmm} && -s {input.virfinder} && -s {input.strand_switch} ]; then
+            python master_table.py {input.hmm} {input.virfinder} {input.strand_switch} > {output.tsv}
+        else
+            echo "No contigs assembled for {wildcards.sample}"
+            touch {output.tsv}
+        fi
         """
 
 
@@ -219,5 +256,10 @@ rule mgv_predict_viral_contigs:
     shell:
         """
         cd {params.fp}
-        python viral_classify.py --features {input.mt} --in_base {params.in_base} --out_base {params.out_base}
+        if [ -s {input.mt} ]; then
+            python viral_classify.py --features {input.mt} --in_base {params.in_base} --out_base {params.out_base}
+        else
+            echo "No contigs assembled for {wildcards.sample}"
+            touch {output.tsv}
+        fi
         """
