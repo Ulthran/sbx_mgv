@@ -32,7 +32,9 @@ localrules:
 
 rule all_mgv:
     input:
-        expand(VIRUS_FP / "mgv" / "{sample}_out" / "{sample}.tsv", sample=Samples.keys()),
+        expand(
+            VIRUS_FP / "mgv" / "{sample}_out" / "{sample}.tsv", sample=Samples.keys()
+        ),
 
 
 rule install_mgv:
@@ -50,7 +52,7 @@ rule install_mgv:
 
         touch {output.installed}
         """
-    
+
 
 rule install_mgv_dbs:
     input:
@@ -89,7 +91,7 @@ rule mgv_prodigal:
     conda:
         "envs/mgv_env.yml"
     resources:
-        mem_mb=16000
+        mem_mb=16000,
     shell:
         """
         cp {input.contigs} {output.fna}

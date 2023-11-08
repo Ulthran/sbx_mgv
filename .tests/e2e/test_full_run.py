@@ -40,7 +40,9 @@ def run_sunbeam(setup):
 
     output_fp = os.path.join(project_dir, "sunbeam_output")
 
-    bfrag_fp = os.path.join(output_fp, f"virus/mgv/PCMP_dummybfragilis_out/PCMP_dummybfragilis.tsv")
+    bfrag_fp = os.path.join(
+        output_fp, f"virus/mgv/PCMP_dummybfragilis_out/PCMP_dummybfragilis.tsv"
+    )
 
     benchmarks_fp = os.path.join(project_dir, "stats/")
 
@@ -55,4 +57,3 @@ def test_full_run(run_sunbeam):
 
     with open(bfrag_fp) as f:
         assert "" == f.readlines()
-
