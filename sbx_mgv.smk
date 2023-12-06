@@ -189,7 +189,7 @@ rule mgv_virfinder:
         """
         cd {params.fp}
         if [ -s {input.contigs} ]; then
-            Rscript virfinder.R {input.contigs} {output.tsv}
+            ${CONDA_PREFIX}/bin/Rscript virfinder.R {input.contigs} {output.tsv}
         else
             echo "No contigs assembled for {wildcards.sample}"
             touch {output.tsv}
