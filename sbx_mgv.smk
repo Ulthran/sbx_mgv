@@ -81,7 +81,7 @@ rule install_mgv_dbs:
 # This relies on the first rule from sbx_virus_id -_-
 rule mgv_prodigal:
     input:
-        contigs=ASSEMBLY_FP / "virus_id_megahit" / "{sample}_asm" / "final.contigs.fa",
+        contigs=ASSEMBLY_FP / "megahit" / "{sample}_asm" / "final.contigs.fa",
         installed=VIRUS_FP / "mgv" / ".installed",
     output:
         fna=VIRUS_FP / "mgv" / "{sample}_in" / "{sample}.fna",

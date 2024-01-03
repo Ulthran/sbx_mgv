@@ -12,6 +12,8 @@
 
 sbx_mgv is a [sunbeam](https://github.com/sunbeam-labs/sunbeam) extension for classifying viral sequences. This pipeline uses [MEGAHIT](https://github.com/voutcn/megahit) for assembly of contigs and [MGV](https://github.com/snayfach/MGV) for virus classification.
 
+N.B. If using Megahit for assembly, this extension requires also having sbx_assembly installed.
+
 ### Installation
 
 ```
